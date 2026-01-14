@@ -62,4 +62,16 @@ Khác với cách tiếp cận truyền thống (RFM thuần), dự án tập tr
 ---
 
 ## 📁 Cấu trúc thư mục
+mini_project_customer_clustering/
+│
+├── miniproject.ipynb # Notebook xử lý dữ liệu & phân cụm
+├── app.py # Dashboard Streamlit
+├── README.md # Mô tả dự án
+│
+├── OnlineRetail.xls # Dữ liệu giao dịch gốc
+├── rules_apriori_filtered.csv # Luật Apriori đã lọc
+├── rules_fpgrowth_filtered.csv # Luật FP-Growth đã lọc
+├── Ket_qua_Phan_cum.csv # Kết quả phân cụm khách hàng
+│
+├── .gitignore
 
