@@ -1,0 +1,117 @@
+# BÁO CÁO MINI PROJECT  
+## PHÂN CỤM KHÁCH HÀNG DỰA TRÊN LUẬT KẾT HỢP
+
+---
+
+## 1. Giới thiệu
+
+Trong bối cảnh thương mại điện tử và bán lẻ hiện đại, việc hiểu rõ hành vi mua sắm của khách hàng đóng vai trò then chốt trong việc xây dựng các chiến lược marketing hiệu quả. Phân cụm khách hàng (Customer Segmentation) là một kỹ thuật phổ biến trong khai phá dữ liệu, giúp chia tập khách hàng thành các nhóm có hành vi tương đồng, từ đó hỗ trợ ra quyết định kinh doanh.
+
+Trong Mini Project này, nhóm lựa chọn hướng tiếp cận **phân cụm khách hàng dựa trên luật kết hợp**. Thay vì chỉ sử dụng các đặc trưng truyền thống như RFM (Recency – Frequency – Monetary), dự án khai thác trực tiếp **các luật mua kèm sản phẩm (association rules)** để xây dựng vector đặc trưng cho từng khách hàng. Cách tiếp cận này cho phép mô hình nắm bắt sâu hơn cấu trúc giỏ hàng và mối quan hệ giữa các sản phẩm được mua cùng nhau.
+
+---
+
+## 2. Mô tả dữ liệu
+
+Dữ liệu được sử dụng trong dự án là bộ **Online Retail Dataset**, bao gồm các giao dịch mua hàng với các thuộc tính chính:
+
+- **InvoiceNo**: Mã hóa đơn  
+- **StockCode**: Mã sản phẩm  
+- **Description**: Tên sản phẩm  
+- **Quantity**: Số lượng mua  
+- **InvoiceDate**: Thời gian giao dịch  
+- **UnitPrice**: Đơn giá  
+- **CustomerID**: Mã khách hàng  
+- **Country**: Quốc gia  
+
+Đây là dữ liệu giao dịch không có nhãn, do đó bài toán phù hợp với hướng **Unsupervised Learning**.
+
+---
+
+## 3. Pipeline thực hiện
+
+### 3.1. Tiền xử lý dữ liệu
+- Loại bỏ các dòng không có `CustomerID`
+- Chuẩn hóa kiểu dữ liệu cho các cột quan trọng
+- Loại bỏ các hóa đơn bị hủy (InvoiceNo bắt đầu bằng ký tự `C`)
+
+### 3.2. Tạo ma trận giỏ hàng (Basket Matrix)
+- Chuyển dữ liệu sang dạng **Customer × Product**
+- Áp dụng one-hot encoding (0/1) để biểu diễn việc khách hàng có mua hay không mua sản phẩm
+
+### 3.3. Khai phá luật kết hợp
+- Áp dụng hai thuật toán **Apriori** và **FP-Growth**
+- Đánh giá luật dựa trên các chỉ số:
+  - Support
+  - Confidence
+  - Lift
+- Lựa chọn **Top-K luật mạnh** (ưu tiên lift cao) để làm đầu vào cho bước phân cụm
+
+### 3.4. Trích xuất đặc trưng từ luật
+- Mỗi luật tương ứng với một feature
+- Khách hàng được gán giá trị `1` nếu thỏa tiền đề (antecedent) của luật, ngược lại là `0`
+- Các feature này được sử dụng làm vector đặc trưng cho từng khách hàng
+
+### 3.5. Phân cụm khách hàng
+- Chuẩn hóa dữ liệu đặc trưng
+- Lựa chọn số cụm K bằng **Silhouette Score**
+- Huấn luyện mô hình **K-Means**
+- Gán nhãn cụm cho từng khách hàng
+
+### 3.6. Trực quan hóa và đánh giá
+- Giảm chiều dữ liệu về 2D bằng **PCA**
+- Vẽ biểu đồ scatter để quan sát mức độ tách cụm
+- Đánh giá tính hợp lý của các cụm dựa trên hình ảnh trực quan và chỉ số silhouette
+
+---
+
+## 4. Kết quả phân cụm
+
+Sau khi huấn luyện mô hình K-Means, tập khách hàng được chia thành các cụm với những đặc trưng hành vi mua sắm khác nhau. Mỗi cụm được phân tích dựa trên:
+- Quy mô cụm (số lượng khách hàng)
+- Các luật mua kèm được kích hoạt nhiều nhất trong cụm
+
+Kết quả cho thấy các cụm có sự khác biệt rõ ràng về hành vi mua sắm, phản ánh những nhóm khách hàng với xu hướng tiêu dùng riêng biệt.
+
+---
+
+## 5. Diễn giải và đề xuất chiến lược marketing
+
+Dựa trên kết quả profiling từng cụm, nhóm đề xuất các chiến lược marketing tương ứng:
+
+- **Bundle / Cross-sell**:  
+  Áp dụng cho các cụm có xu hướng mua kèm nhiều sản phẩm, nhằm tăng giá trị đơn hàng.
+
+- **Upsell**:  
+  Hướng tới các nhóm khách hàng có tần suất mua cao hoặc thường xuyên mua các sản phẩm giá trị cao.
+
+- **Chiến dịch kích hoạt lại**:  
+  Nhắm tới các cụm khách hàng ít tương tác hoặc có dấu hiệu giảm tần suất mua.
+
+Việc gắn kết trực tiếp chiến lược marketing với đặc trưng cụm giúp tăng tính khả thi và giá trị ứng dụng của kết quả phân tích.
+
+---
+
+## 6. Dashboard trực quan hóa
+
+Nhóm xây dựng dashboard bằng **Streamlit** nhằm:
+- Hiển thị kết quả phân cụm khách hàng
+- Cho phép lọc và phân tích theo từng cụm
+- Quan sát các luật mua sắm nổi bật trong mỗi nhóm
+
+Dashboard hỗ trợ việc khám phá dữ liệu một cách trực quan và thuận tiện cho người dùng.
+
+---
+
+## 7. Kết luận
+
+Mini Project đã minh họa thành công quy trình kết hợp giữa **khai phá luật kết hợp** và **phân cụm khách hàng**. Cách tiếp cận dựa trên luật cho phép mô hình nắm bắt sâu hơn hành vi mua kèm sản phẩm, từ đó tạo ra các cụm khách hàng có ý nghĩa và giá trị cho việc ra quyết định marketing.
+
+Trong tương lai, dự án có thể được mở rộng bằng cách kết hợp thêm các đặc trưng RFM, thử nghiệm các thuật toán phân cụm khác hoặc mở rộng dashboard để hỗ trợ đề xuất chiến lược marketing tự động.
+
+---
+
+## 8. Tài liệu tham khảo
+
+- Han, J., Kamber, M., & Pei, J. (2012). *Data Mining: Concepts and Techniques*. Morgan Kaufmann.  
+- Online Retail Dataset – UCI Machine Learning Repository
